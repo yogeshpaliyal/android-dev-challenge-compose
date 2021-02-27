@@ -22,11 +22,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.Text
+import androidx.compose.material.IconButton
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -38,7 +49,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavType
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.navigate
 import com.example.androiddevchallenge.data.DogModel
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
@@ -64,13 +79,14 @@ fun MyApp(mViewModel: MainActivityViewModel) {
     val list: List<DogModel> by mViewModel.list.observeAsState(listOf())
 
     NavHost(navController, startDestination = "list") {
-        composable("list") { Listing(navController,list) }
-        composable("detail/{dog}", arguments = listOf(navArgument("dog",builder = {
+        composable("list") { Listing(navController, list) }
+        composable("detail/{dog}", arguments = listOf(navArgument("dog", builder = {
             type = NavType.IntType
         }))) {
             val id = it.arguments?.getInt("dog")
             val dogModel = mViewModel.getDog(id)
-            Detail(navController,dogModel) }
+            Detail(navController, dogModel)
+        }
     }
 
 
@@ -78,12 +94,12 @@ fun MyApp(mViewModel: MainActivityViewModel) {
 
 
 @Composable
-fun Listing(navController: NavController,list: List<DogModel>){
+fun Listing(navController: NavController, list: List<DogModel>) {
     Column {
         TopAppBar(title = {
             Text(text = "Adopt a Dog")
         })
-        DogsList(list = list){
+        DogsList(list = list) {
 
             navController.navigate("detail/${it.id}") {
             }
@@ -92,7 +108,7 @@ fun Listing(navController: NavController,list: List<DogModel>){
 }
 
 @Composable
-fun Detail(navController: NavController, dogModel: DogModel?){
+fun Detail(navController: NavController, dogModel: DogModel?) {
     dogModel ?: return
     Column {
         TopAppBar(title = {
@@ -105,9 +121,14 @@ fun Detail(navController: NavController, dogModel: DogModel?){
         Surface(
             Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()) {
+                .fillMaxHeight()
+        ) {
             Column(Modifier.fillMaxWidth()) {
-                Image(painter = painterResource(id = dogModel.image), contentDescription = null, modifier = Modifier.fillMaxWidth())
+                Image(
+                    painter = painterResource(id = dogModel.image),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
             }
 
@@ -119,7 +140,7 @@ fun Detail(navController: NavController, dogModel: DogModel?){
  * @param list
  */
 @Composable
-fun DogsList(list: List<DogModel>, onItemSelect : (DogModel)->Unit) {
+fun DogsList(list: List<DogModel>, onItemSelect: (DogModel) -> Unit) {
 
     LazyColumn(
         Modifier
