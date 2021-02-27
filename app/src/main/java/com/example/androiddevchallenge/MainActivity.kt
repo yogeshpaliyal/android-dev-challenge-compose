@@ -22,22 +22,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.Text
-import androidx.compose.material.IconButton
 import androidx.compose.material.Card
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -52,11 +52,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.navigate
+import androidx.navigation.compose.rememberNavController
 import com.example.androiddevchallenge.data.DogModel
 import com.example.androiddevchallenge.ui.theme.MyTheme
-
 
 class MainActivity : AppCompatActivity() {
     private val mViewModel by viewModels<MainActivityViewModel>()
@@ -71,7 +70,6 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-
 // Start building your app here!
 @Composable
 fun MyApp(mViewModel: MainActivityViewModel) {
@@ -80,25 +78,32 @@ fun MyApp(mViewModel: MainActivityViewModel) {
 
     NavHost(navController, startDestination = "list") {
         composable("list") { Listing(navController, list) }
-        composable("detail/{dog}", arguments = listOf(navArgument("dog", builder = {
-            type = NavType.IntType
-        }))) {
+        composable(
+            "detail/{dog}",
+            arguments = listOf(
+                navArgument(
+                    "dog",
+                    builder = {
+                        type = NavType.IntType
+                    }
+                )
+            )
+        ) {
             val id = it.arguments?.getInt("dog")
             val dogModel = mViewModel.getDog(id)
             Detail(navController, dogModel)
         }
     }
-
-
 }
-
 
 @Composable
 fun Listing(navController: NavController, list: List<DogModel>) {
     Column {
-        TopAppBar(title = {
-            Text(text = "Adopt a Dog")
-        })
+        TopAppBar(
+            title = {
+                Text(text = "Adopt a Dog")
+            }
+        )
         DogsList(list = list) {
 
             navController.navigate("detail/${it.id}") {
@@ -111,13 +116,15 @@ fun Listing(navController: NavController, list: List<DogModel>) {
 fun Detail(navController: NavController, dogModel: DogModel?) {
     dogModel ?: return
     Column {
-        TopAppBar(title = {
-            Text(text = "Umesh")
-        }, navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
-
+        TopAppBar(
+            title = {
+                Text(text = "Umesh")
+            },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                }
             }
-        })
+        )
         Surface(
             Modifier
                 .fillMaxWidth()
@@ -129,9 +136,7 @@ fun Detail(navController: NavController, dogModel: DogModel?) {
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth()
                 )
-
             }
-
         }
     }
 }
@@ -147,39 +152,45 @@ fun DogsList(list: List<DogModel>, onItemSelect: (DogModel) -> Unit) {
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
-        items(items = list, itemContent = { item ->
-            Card(
-                Modifier
-                    .padding(8.dp)
-                    .clickable(true, onClick = {
-                        onItemSelect(item)
-                    })
-                    .focusable(true)
-                    .fillMaxWidth(), elevation = 1.dp
-            ) {
-                Row(Modifier.fillMaxWidth()) {
-                    Image(
-                        modifier = Modifier
-                            .padding(top = 8.dp, start = 8.dp)
-                            .height(50.dp)
-                            .aspectRatio(1f)
-                            .clip(CircleShape),
-                        painter = painterResource(id = item.image),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    ) {
-                        Text(text = item.name, style = MaterialTheme.typography.h6)
-                        Text(text = item.breed, style = MaterialTheme.typography.subtitle1)
+        items(
+            items = list,
+            itemContent = { item ->
+                Card(
+                    Modifier
+                        .padding(8.dp)
+                        .clickable(
+                            true,
+                            onClick = {
+                                onItemSelect(item)
+                            }
+                        )
+                        .focusable(true)
+                        .fillMaxWidth(),
+                    elevation = 1.dp
+                ) {
+                    Row(Modifier.fillMaxWidth()) {
+                        Image(
+                            modifier = Modifier
+                                .padding(top = 8.dp, start = 8.dp)
+                                .height(50.dp)
+                                .aspectRatio(1f)
+                                .clip(CircleShape),
+                            painter = painterResource(id = item.image),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
+                        )
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        ) {
+                            Text(text = item.name, style = MaterialTheme.typography.h6)
+                            Text(text = item.breed, style = MaterialTheme.typography.subtitle1)
+                        }
                     }
                 }
-
             }
-        })
+        )
     }
 }
 
