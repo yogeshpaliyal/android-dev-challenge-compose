@@ -23,6 +23,7 @@ To set up ktlint correctly with Android Studio, follow one of the [listed setup 
 
 Before committing your code, run `./gradlew app:spotlessApply` to automatically format your code.
 
+
 ## License
 ```
 Copyright 2020 The Android Open Source Project
