@@ -20,6 +20,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -47,6 +52,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -101,7 +108,7 @@ fun Listing(navController: NavController, list: List<DogModel>) {
     Column {
         TopAppBar(
             title = {
-                Text(text = "Adopt a Dog")
+                Text(text = "Adopt a Dog", color = MaterialTheme.colors.onPrimary)
             }
         )
         DogsList(list = list) {
@@ -118,24 +125,69 @@ fun Detail(navController: NavController, dogModel: DogModel?) {
     Column {
         TopAppBar(
             title = {
-                Text(text = "Umesh")
+                Text(text = dogModel.name, style = MaterialTheme.typography.h6, color = MaterialTheme.colors.onPrimary)
             },
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
+                        contentDescription = null
+                    )
                 }
             }
         )
         Surface(
             Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
+                .fillMaxHeight().verticalScroll(ScrollState(0))
         ) {
             Column(Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(id = dogModel.image),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth()
-                )
+
+                ConstraintLayout {
+                    val (image, button) = createRefs()
+
+                    Image(
+                        painter = painterResource(id = dogModel.image),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .constrainAs(image) {
+                                top.linkTo(parent.top)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            }
+                            .fillMaxWidth(),
+                    )
+
+                    Button(
+                        onClick = {
+
+                        },
+                        modifier = Modifier.constrainAs(button) {
+                            top.linkTo(image.bottom)
+                            bottom.linkTo(image.bottom)
+                            end.linkTo(image.end, margin = 16.dp)
+                        },
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Row() {
+                            Icon(painter = painterResource(id = R.drawable.ic_round_favorite_border_24), contentDescription = null)
+                            Text(text = "Adopt", modifier = Modifier.padding(start = 8.dp), color = MaterialTheme.colors.onPrimary)
+                        }
+                    }
+                }
+                Column(Modifier.padding(start = 16.dp, end = 16.dp)) {
+                    Text(text = "Name", style = MaterialTheme.typography.subtitle1)
+                    Text(text = dogModel.name, style = MaterialTheme.typography.body1)
+
+                    Text(text = "Breed", style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(top = 8.dp))
+                    Text(text = dogModel.breed, style = MaterialTheme.typography.body1)
+
+                    Text(text = "Age", style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(top = 8.dp))
+                    Text(text = dogModel.age, style = MaterialTheme.typography.body1)
+
+                    Text(text = "Information", style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(top = 8.dp))
+                    Text(text = dogModel.desc, style = MaterialTheme.typography.body1)
+                }
             }
         }
     }
