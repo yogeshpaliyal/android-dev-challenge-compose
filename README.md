@@ -15,7 +15,7 @@ A puppy adoption app which lets you find a puppy and see the info like name, bre
 One of the motivation is that, this is a Google Developer Challenge & Organized by Google. 
 This challenge give opportunity to stand out, showcase our skills.
 Jetpack is probably the future of Android, learning in early phase help understand how it works & will keep us up to date with new technologies.
-
+I am proud of to Learning and using new things.
 
 ## :camera_flash: Screenshots
 <!-- You can add more screenshots here if you like -->
