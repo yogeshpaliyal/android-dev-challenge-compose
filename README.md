@@ -7,16 +7,19 @@
 
 ## :scroll: Description
 <!--- Describe your app in one or two sentences -->
-
+A puppy adoption app which lets you find a puppy and see the info like name, breed, image, age & description.
 
 ## :bulb: Motivation and Context
 <!--- Optionally point readers to interesting parts of your submission. -->
 <!--- What are you especially proud of? -->
+One of the motivation is that, this is a Google Developer Challenge & Organized by Google. 
+This challenge give opportunity to stand out, showcase our skills.
+Jetpack is probably the future of Android, learning in early phase help understand how it works & will keep us up to date with new technologies.
 
 
 ## :camera_flash: Screenshots
 <!-- You can add more screenshots here if you like -->
-<img src="/results/screenshot_1.png" width="260">&emsp;<img src="/results/screenshot_2.png" width="260">
+<img src="/results/screenshot_1.png" width="260">&emsp;<img src="/results/screenshot_2.png" width="260">&emsp;<img src="/results/screenshot_3.png" width="260">&emsp;<img src="/results/screenshot_4.png" width="260">
 
 ## License
 ```
