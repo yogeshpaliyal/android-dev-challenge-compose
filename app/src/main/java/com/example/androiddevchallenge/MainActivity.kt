@@ -46,11 +46,13 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -63,6 +65,7 @@ import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.example.androiddevchallenge.data.DogModel
 import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.theme.white
 
 class MainActivity : AppCompatActivity() {
     private val mViewModel by viewModels<MainActivityViewModel>()
@@ -70,8 +73,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyTheme {
-                MyApp(mViewModel)
+            var isDarkMode by remember { mutableStateOf(false) }
+            MyTheme(darkTheme = isDarkMode) {
+                MyApp(mViewModel) {
+                    isDarkMode = it
+                }
             }
         }
     }
@@ -79,12 +85,12 @@ class MainActivity : AppCompatActivity() {
 
 // Start building your app here!
 @Composable
-fun MyApp(mViewModel: MainActivityViewModel) {
+fun MyApp(mViewModel: MainActivityViewModel, onThemeChange: (Boolean) -> Unit) {
     val navController = rememberNavController()
     val list: List<DogModel> by mViewModel.list.observeAsState(listOf())
 
     NavHost(navController, startDestination = "list") {
-        composable("list") { Listing(navController, list) }
+        composable("list") { Listing(navController, list, onThemeChange) }
         composable(
             "detail/{dog}",
             arguments = listOf(
@@ -104,15 +110,24 @@ fun MyApp(mViewModel: MainActivityViewModel) {
 }
 
 @Composable
-fun Listing(navController: NavController, list: List<DogModel>) {
+fun Listing(navController: NavController, list: List<DogModel>, onThemeChange: (isDarkMode: Boolean) -> Unit, isDarkMode: Boolean = !MaterialTheme.colors.isLight) {
     Column {
         TopAppBar(
             title = {
                 Text(text = "Adopt a Dog", color = MaterialTheme.colors.onPrimary)
+            },
+
+            actions = {
+                IconButton(
+                    onClick = {
+                        onThemeChange(!isDarkMode)
+                    }
+                ) {
+                    Icon(painter = painterResource(id = R.drawable.ic_baseline_dark_mode_24), contentDescription = null, tint = white)
+                }
             }
         )
         DogsList(list = list) {
-
             navController.navigate("detail/${it.id}") {
             }
         }
@@ -139,7 +154,8 @@ fun Detail(navController: NavController, dogModel: DogModel?) {
         Surface(
             Modifier
                 .fillMaxWidth()
-                .fillMaxHeight().verticalScroll(ScrollState(0))
+                .fillMaxHeight()
+                .verticalScroll(ScrollState(0))
         ) {
             Column(Modifier.fillMaxWidth()) {
 
@@ -156,11 +172,11 @@ fun Detail(navController: NavController, dogModel: DogModel?) {
                                 end.linkTo(parent.end)
                             }
                             .fillMaxWidth(),
+                        contentScale = ContentScale.FillWidth
                     )
 
                     Button(
                         onClick = {
-
                         },
                         modifier = Modifier.constrainAs(button) {
                             top.linkTo(image.bottom)
@@ -199,60 +215,66 @@ fun Detail(navController: NavController, dogModel: DogModel?) {
 @Composable
 fun DogsList(list: List<DogModel>, onItemSelect: (DogModel) -> Unit) {
 
-    LazyColumn(
+    Surface(
         Modifier
-            .fillMaxHeight()
             .fillMaxWidth()
+            .fillMaxHeight()
     ) {
-        items(
-            items = list,
-            itemContent = { item ->
-                Card(
-                    Modifier
-                        .padding(8.dp)
-                        .clickable(
-                            true,
-                            onClick = {
-                                onItemSelect(item)
+        LazyColumn(
+            Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+        ) {
+            items(
+                items = list,
+                itemContent = { item ->
+                    Card(
+                        Modifier
+                            .padding(8.dp)
+                            .clickable(
+                                true,
+                                onClick = {
+                                    onItemSelect(item)
+                                }
+                            )
+                            .focusable(true)
+                            .fillMaxWidth(),
+                        elevation = 1.dp
+                    ) {
+                        Row(Modifier.fillMaxWidth()) {
+                            Image(
+                                modifier = Modifier
+                                    .padding(top = 8.dp, start = 8.dp)
+                                    .height(50.dp)
+                                    .aspectRatio(1f)
+                                    .clip(CircleShape),
+                                painter = painterResource(id = item.image),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop
+                            )
+                            Column(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            ) {
+                                Text(text = item.name, style = MaterialTheme.typography.h6)
+                                Text(text = item.breed, style = MaterialTheme.typography.subtitle1)
                             }
-                        )
-                        .focusable(true)
-                        .fillMaxWidth(),
-                    elevation = 1.dp
-                ) {
-                    Row(Modifier.fillMaxWidth()) {
-                        Image(
-                            modifier = Modifier
-                                .padding(top = 8.dp, start = 8.dp)
-                                .height(50.dp)
-                                .aspectRatio(1f)
-                                .clip(CircleShape),
-                            painter = painterResource(id = item.image),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop
-                        )
-                        Column(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        ) {
-                            Text(text = item.name, style = MaterialTheme.typography.h6)
-                            Text(text = item.breed, style = MaterialTheme.typography.subtitle1)
                         }
                     }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
-@Preview("Light Theme", widthDp = 360, heightDp = 640)
+/*@Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun LightPreview() {
     MyTheme {
-        MyApp(MainActivityViewModel())
+        MyApp(MainActivityViewModel()){}
     }
-}
+}*/
 
 /*@Preview("Dark Theme", widthDp = 360, heightDp = 640)
 @Composable
